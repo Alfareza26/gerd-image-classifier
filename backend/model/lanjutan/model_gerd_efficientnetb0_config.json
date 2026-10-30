@@ -1,0 +1,101 @@
+{
+  "architecture": "EfficientNetB0",
+  "dataset_path": "/content/drive/MyDrive/GERD_Project/GERD.zip",
+  "img_size": [
+    224,
+    224
+  ],
+  "batch_size": 16,
+  "epochs_head_max": 20,
+  "head_learning_rate": 0.0003,
+  "dropout": 0.35,
+  "l2": 0.0001,
+  "label_smoothing": 0.0,
+  "fine_stages": [
+    {
+      "unfreeze_frac": 0.25,
+      "lr": 1e-05,
+      "epochs": 25
+    },
+    {
+      "unfreeze_frac": 0.6,
+      "lr": 5e-06,
+      "epochs": 25
+    }
+  ],
+  "patience": 6,
+  "tta": true,
+  "threshold_metric": "recall_target",
+  "targets": {
+    "accuracy": 0.9,
+    "recall": 0.9,
+    "roc_auc": 0.95
+  },
+  "target_check": {
+    "validation": {
+      "accuracy": 0.8818897637795275,
+      "recall": 0.9256594724220624,
+      "roc_auc": 0.9536946713815386,
+      "specificity": 0.8432203389830508,
+      "loss": 0.6382148861885071,
+      "accuracy_ok": false,
+      "recall_ok": true,
+      "roc_auc_ok": true
+    },
+    "test": {
+      "accuracy": 0.8796400449943758,
+      "recall": 0.9124700239808153,
+      "roc_auc": 0.9509930191440068,
+      "specificity": 0.850635593220339,
+      "loss": 0.6249139904975891,
+      "accuracy_ok": false,
+      "recall_ok": true,
+      "roc_auc_ok": true
+    }
+  },
+  "color_mode": "RGB",
+  "pixel_range": "0-255 (rescaling internal EfficientNet)",
+  "label_mapping": {
+    "GERD_Normal": 0,
+    "GERD": 1
+  },
+  "threshold": 0.8899999999999999,
+  "selected_stage": "fine-tuning 2",
+  "split_sizes": {
+    "train": 8886,
+    "val": 1778,
+    "test": 1778
+  },
+  "grouped_split": false,
+  "test_metrics": {
+    "accuracy": 0.8796400449943758,
+    "balanced_accuracy": 0.8815528086005772,
+    "sensitivity_recall": 0.9124700239808153,
+    "specificity": 0.850635593220339,
+    "precision": 0.843680709534368,
+    "f1": 0.8767281105990783,
+    "mcc": 0.7617252482379516,
+    "roc_auc": 0.9509930191440068,
+    "pr_auc": 0.9478718899757455,
+    "brier": 0.18623330118821407,
+    "threshold": 0.8899999999999999
+  },
+  "test_ci95": {
+    "roc_auc": [
+      0.9419174707480517,
+      0.9599646927961087
+    ],
+    "sensitivity_recall": [
+      0.8941686603727634,
+      0.9311668465914147
+    ],
+    "specificity": [
+      0.8277292495945746,
+      0.8742230818358638
+    ],
+    "f1": [
+      0.8603134136469024,
+      0.8932535497053343
+    ]
+  }
+}

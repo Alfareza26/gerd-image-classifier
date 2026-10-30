@@ -1,0 +1,6 @@
+{
+  "name": "GERD Image Classifier",
+  "description": "Sistem klasifikasi citra medis berbasis deep learning untuk membantu analisis tanda-tanda yang berkaitan dengan GERD pada citra endoskopi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

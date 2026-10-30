@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GERD AI Image Classifier - Clinical Decision Support</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed": "#dbe1ff",
+            "on-primary-fixed-variant": "#004b73",
+            "tertiary": "#00685f",
+            "error": "#ba1a1a",
+            "primary-fixed-dim": "#93ccff",
+            "surface-dim": "#d2d9f4",
+            "inverse-primary": "#93ccff",
+            "surface-bright": "#faf8ff",
+            "tertiary-fixed": "#89f5e7",
+            "surface-container-lowest": "#ffffff",
+            "inverse-on-surface": "#eef0ff",
+            "surface-container-highest": "#dae2fd",
+            "tertiary-fixed-dim": "#6bd8cb",
+            "surface-container-low": "#f2f3ff",
+            "tertiary-container": "#008378",
+            "on-secondary": "#ffffff",
+            "secondary": "#0051d5",
+            "on-tertiary-fixed": "#00201d",
+            "on-secondary-container": "#fefcff",
+            "surface-variant": "#dae2fd",
+            "on-surface-variant": "#3f4850",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#b4c5ff",
+            "primary-fixed": "#cce5ff",
+            "surface-container-high": "#e2e7ff",
+            "outline": "#707881",
+            "background": "#faf8ff",
+            "on-tertiary-fixed-variant": "#005049",
+            "on-background": "#131b2e",
+            "surface-container": "#eaedff",
+            "secondary-container": "#316bf3",
+            "on-error": "#ffffff",
+            "on-surface": "#131b2e",
+            "on-tertiary-container": "#f4fffc",
+            "surface-tint": "#006398",
+            "error-container": "#ffdad6",
+            "primary-container": "#007bb9",
+            "surface": "#faf8ff",
+            "inverse-surface": "#283044",
+            "on-primary-container": "#fdfcff",
+            "on-secondary-fixed": "#00174b",
+            "on-secondary-fixed-variant": "#003ea8",
+            "on-primary-fixed": "#001d31",
+            "on-primary": "#ffffff",
+            "outline-variant": "#bfc7d2",
+            "on-error-container": "#93000a",
+            "primary": "#006194"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-md": "0.75rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "space-lg": "1.25rem",
+            "margin-mobile": "1rem",
+            "gutter-mobile": "0.75rem",
+            "margin": "1.5rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "body-lg": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-xl-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen font-body-md text-body-md overflow-x-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- ========================================== -->
+<!-- COMPREHENSIVE TOP NAVIGATION BAR           -->
+<!-- ========================================== -->
+<header class="sticky top-0 w-full bg-surface-container-lowest border-b border-outline-variant/40 z-50 shadow-[0_1px_3px_0_rgba(15,23,42,0.03)]"><div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4"><div class="flex items-center gap-3 flex-shrink-0"><div class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-2xl">vital_signs</span></div><div><div class="flex items-center gap-2"><h1 class="text-headline-sm font-headline-sm font-bold text-on-surface tracking-tight">GERD Image Classifier</h1><span class="text-label-sm font-label-sm bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded font-semibold">GERD AI v2.4</span></div><p class="text-label-md font-label-md text-on-surface-variant leading-none mt-0.5">AI untuk Analisis Citra Endoskopi Medis</p></div></div><nav aria-label="Main Navigation" class="hidden md:flex items-center gap-1.5 flex-1 max-w-xl mx-4"><a class="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-on-primary font-semibold text-label-lg font-label-lg shadow-sm transition-all" href="#"><span class="material-symbols-outlined text-lg">home</span><span>Beranda</span></a><a class="flex items-center gap-2 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-label-lg font-label-lg" href="#"><span class="material-symbols-outlined text-lg">cloud_upload</span><span>Upload Gambar</span></a><a class="flex items-center gap-2 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-label-lg font-label-lg" href="#"><span class="material-symbols-outlined text-lg">history</span><span>Riwayat Pemeriksaan</span></a><a class="flex items-center gap-2 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-label-lg font-label-lg" href="#"><span class="material-symbols-outlined text-lg">account_circle</span><span>Profil Pengguna</span></a></nav><div class="flex items-center gap-3 flex-shrink-0"><button class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-label-lg font-label-lg shadow-sm transition-all active:scale-[0.98]"><span class="material-symbols-outlined text-lg">play_arrow</span><span>Mulai Analisis</span></button><button class="relative p-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low transition-colors" title="Notifikasi"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span></button><div class="h-6 w-px bg-outline-variant/40 hidden sm:block"></div><div class="flex items-center gap-2.5 pl-1 py-1 pr-2 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer border border-transparent hover:border-outline-variant/30"><img alt="Foto profil dr. Ahmad Rizki Sp.PD-KGEH" class="w-8 h-8 rounded-full border border-primary-fixed/60 object-cover flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUCeLxvcPCpRlVJqrewwfFw9r_yI03xMhVKyeQauzKbRkqgERLwGSA5B6JQB7FgyErB_c8GNlf2pNw6-FWE2DVjy-5H5pp40o7376V5RPCI79feaiYJ1oO7fv-3PKM2nUk2S7Ix6mmuJMGrtNXA-RwrQhdaLZDM-rAs9wgV-hdNx4poIs5j6vNNUhmkVG1sMJFeSFscSnmp0Zn5yqStttxyvm34ezrNwnAYMBAG9dGLhiWVhHMwRJD"/><div class="hidden lg:block text-left"><p class="text-label-md font-label-md font-bold text-on-surface leading-tight">dr. Ahmad Rizki</p><p class="text-label-sm font-label-sm text-on-surface-variant leading-tight">Sp.PD-KGEH</p></div></div></div></div><div class="border-t border-outline-variant/30 bg-surface-container-low/70 px-4 sm:px-6 py-2"><div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-label-md font-label-md"><div class="flex items-center flex-wrap gap-2 text-on-surface-variant"><span class="font-bold text-on-surface">Platform Diagnostik</span><span class="text-outline-variant/60">/</span><span class="text-primary font-semibold">Modul: Klasifikasi Citra Endoskopi</span><span class="text-outline-variant/60">•</span><span class="text-on-surface-variant font-medium">MobileNetV2 (Feature Extraction &amp; Grad-CAM)</span><span class="text-outline-variant/60">•</span><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-label-sm font-label-sm uppercase font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Status: Siap Analisis</span></div><div class="flex items-center gap-3"><div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-surface-container-highest/60 text-label-sm font-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-sm text-primary">info</span><span>Aplikasi ini hanya melakukan klasifikasi citra medis, bukan mendiagnosis pasti.</span></div></div></div></div></header>
+<!-- ========================================== -->
+<!-- MAIN WORKSPACE CONTENT CANVAS (FULL WIDTH) -->
+<!-- ========================================== -->
+<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6">
+<!-- HERO CLINICAL BANNER -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant/50 p-6 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)] relative overflow-hidden"><div class="absolute -right-16 -top-16 w-64 h-64 bg-primary-fixed/30 rounded-full blur-3xl pointer-events-none"></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10"><div class="lg:col-span-5 flex flex-col justify-between space-y-4"><div><div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-secondary-fixed/50 text-on-secondary-fixed text-label-sm font-label-sm uppercase tracking-wider font-semibold mb-2"><span class="material-symbols-outlined text-sm">biotech</span>Deep Learning Endoscopy Decision Support</div><h2 class="text-headline-xl font-headline-xl font-extrabold text-on-surface tracking-tight">GERD Image Classifier</h2><p class="text-headline-sm font-headline-sm font-semibold text-primary mt-1">AI untuk Analisis Citra Endoskopi</p><p class="text-body-md font-body-md text-on-surface-variant mt-2.5 leading-relaxed">Sistem klasifikasi citra medis berbasis deep learning untuk membantu analisis tanda-tanda yang berkaitan dengan GERD pada citra endoskopi.</p></div><div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed/30 border border-primary-fixed text-primary text-label-sm font-label-sm font-semibold"><span class="material-symbols-outlined text-base">verified</span><span>Untuk edukasi dan penelitian — bukan pengganti diagnosis medis.</span></div></div><div class="lg:col-span-7 flex flex-col gap-3"><div class="flex items-center justify-between"><h3 class="text-headline-sm font-headline-sm font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary text-xl">apps</span><span>Fitur Utama</span></h3><span class="text-label-sm font-label-sm text-on-surface-variant font-medium">Arsitektur Sistem</span></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="p-3.5 rounded-lg bg-surface border border-outline-variant/50 hover:border-primary transition-all flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-xl">home</span></div><div><h4 class="text-label-lg font-label-lg font-bold text-on-surface">Beranda</h4><p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5 leading-snug">Informasi aplikasi dan mulai analisis.</p></div></div><div class="p-3.5 rounded-lg bg-surface border border-outline-variant/50 hover:border-primary transition-all flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-xl">cloud_upload</span></div><div><h4 class="text-label-lg font-label-lg font-bold text-on-surface">Upload Gambar</h4><p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5 leading-snug">Unggah citra endoskopi dan validasi otomatis.</p></div></div><div class="p-3.5 rounded-lg bg-surface border border-outline-variant/50 hover:border-primary transition-all flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-xl">analytics</span></div><div><h4 class="text-label-lg font-label-lg font-bold text-on-surface">Hasil Prediksi</h4><p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5 leading-snug">Kelas, skor, heatmap Grad-CAM, dan penjelasan.</p></div></div><div class="p-3.5 rounded-lg bg-surface border border-outline-variant/50 hover:border-primary transition-all flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-xl">history</span></div><div><h4 class="text-label-lg font-label-lg font-bold text-on-surface">Riwayat Pemeriksaan</h4><p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5 leading-snug">Lihat hasil analisis sebelumnya dan kelola akun.</p></div></div></div><div class="p-3 rounded-lg bg-surface-container-low border border-primary/20 flex items-start gap-2.5 mt-1"><span class="material-symbols-outlined text-primary text-lg mt-0.5">info</span><div><p class="text-label-sm font-label-sm font-bold text-on-surface">Catatan Penting Medis</p><p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Aplikasi ini hanya melakukan klasifikasi citra medis, bukan mendiagnosis GERD secara pasti. Hasil prediksi harus selalu dikonfirmasi oleh tenaga medis profesional.</p></div></div></div></div></div>
+<!-- 3-COLUMN CLINICAL DIAGNOSTIC WORKSPACE -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant/60 p-4 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)]"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-surface-container mb-3"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-xl">view_carousel</span><h3 class="text-label-lg font-label-lg font-bold text-on-surface">Wireframe Halaman Aplikasi (7 Modul Sistem)</h3></div><span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-semibold">Interaktif Terpadu</span></div><div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2"><button class="p-2.5 rounded-lg border border-outline-variant/40 bg-surface hover:bg-surface-container-low transition-colors text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center text-label-sm font-bold">1</span><span class="text-label-sm font-label-sm font-bold text-on-surface truncate">Login / Masuk</span></button><button class="p-2.5 rounded-lg border border-primary bg-primary-fixed/30 text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-sm font-bold">2</span><span class="text-label-sm font-label-sm font-bold text-primary truncate">Beranda</span></button><button class="p-2.5 rounded-lg border border-outline-variant/40 bg-surface hover:bg-surface-container-low transition-colors text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center text-label-sm font-bold">3</span><span class="text-label-sm font-label-sm font-bold text-on-surface truncate">Upload Gambar</span></button><button class="p-2.5 rounded-lg border border-outline-variant/40 bg-surface hover:bg-surface-container-low transition-colors text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center text-label-sm font-bold">4</span><span class="text-label-sm font-label-sm font-bold text-on-surface truncate">Proses Analisis</span></button><button class="p-2.5 rounded-lg border border-outline-variant/40 bg-surface hover:bg-surface-container-low transition-colors text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center text-label-sm font-bold">5</span><span class="text-label-sm font-label-sm font-bold text-on-surface truncate">Hasil Prediksi</span></button><button class="p-2.5 rounded-lg border border-outline-variant/40 bg-surface hover:bg-surface-container-low transition-colors text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center text-label-sm font-bold">6</span><span class="text-label-sm font-label-sm font-bold text-on-surface truncate">Riwayat</span></button><button class="p-2.5 rounded-lg border border-outline-variant/40 bg-surface hover:bg-surface-container-low transition-colors text-left flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center text-label-sm font-bold">7</span><span class="text-label-sm font-label-sm font-bold text-on-surface truncate">Profil Pengguna</span></button></div></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- ============================================== -->
+<!-- COLUMN 1: UNGGAH & VALIDASI CITRA (4 COLS)     -->
+<!-- ============================================== -->
+<section class="lg:col-span-4 flex flex-col gap-4">
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant/60 p-5 flex flex-col h-full shadow-[0_1px_3px_0_rgba(15,23,42,0.04)]">
+<div class="flex items-center justify-between pb-3 border-b border-surface-container mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="add_photo_alternate">add_photo_alternate</span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">1. Unggah Citra Endoskopi</h3>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-semibold">Step 1-3</span>
+</div>
+<!-- Drag and Drop Area -->
+<div class="border-2 border-dashed border-outline-variant hover:border-primary rounded-lg p-5 flex flex-col items-center justify-center text-center bg-surface hover:bg-surface-container-low/40 transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary group-hover:scale-105 transition-transform mb-3">
+<span class="material-symbols-outlined text-2xl" data-icon="cloud_upload">cloud_upload</span>
+</div>
+<p class="text-label-lg font-label-lg text-on-surface font-semibold">Tarik dan lepas gambar di sini</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">atau klik untuk memilih dari direktori lokal</p>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-outline">
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono">JPG</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono">JPEG</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono">PNG</span>
+<span>Maksimal 10 MB</span>
+</div>
+<button class="mt-3 px-4 py-1.5 rounded-lg border border-outline bg-surface-container-lowest hover:bg-surface-container-low text-on-surface text-label-md font-label-md font-semibold transition-colors">
+            Pilih File Endoskopi
+          </button>
+</div>
+<!-- File Active Inspection Card -->
+<div class="mt-4 p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/50">
+<div class="flex items-center justify-between mb-2.5">
+<span class="text-label-sm font-label-sm uppercase font-bold text-on-surface-variant tracking-wider">Pratinjau Citra Aktif</span>
+<span class="inline-flex items-center gap-1 text-label-sm font-label-sm text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+<span class="material-symbols-outlined text-xs" data-icon="check_circle">check_circle</span>
+              Valid
+            </span>
+</div>
+<div class="flex gap-3">
+<img alt="endoscopy_zline_sample_001" class="w-20 h-20 rounded border border-outline-variant/60 object-cover flex-shrink-0" data-alt="A clinical high-resolution endoscopic photograph of the gastroesophageal junction and Z-line showing clear mucosal folds, vascular patterns, and distinct mucosal breaks indicative of gastroesophageal reflux disease." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDonm_AnLEZDh02oP8oIwSETfNG40Mv1N6RdUDdOwIZICzWBPjVYQPGx4M1dn9rHJLzWdgMNTQC_wJUzcOvlxb4BwQAo8sdmESS5vlebC5_22NzkGtsUslGKPH0EHrR2Ktyra28tMpARSg78pPT7dwIZXJdj-NMFgFZKMtX44TC91qBXSIxYjND_xoaUKuK2v3Z__QPlKEkEniqjg9i9oWPHWOZ882zoGEz9XG0-3wguX91fY5odPuU"/>
+<div class="flex-1 min-w-0">
+<p class="text-label-md font-label-md font-bold text-on-surface truncate">endoscopy_z-line_001.jpg</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant font-mono">2.4 MB • 1920×1080 px</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Studi: Endoskopi Saluran Cerna Atas (EGD)</p>
+</div>
+</div>
+<!-- Pipeline Validation Step Checklist -->
+<div class="mt-3 pt-3 border-t border-outline-variant/30 space-y-1.5">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-emerald-600 text-sm" data-icon="check">check</span>
+                Validasi format &amp; integritas bit citra
+              </span>
+<span class="text-label-sm font-label-sm text-emerald-600 font-bold">OK</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-emerald-600 text-sm" data-icon="check">check</span>
+                Preprocessing (Resize 224x224 &amp; Normalisasi)
+              </span>
+<span class="text-label-sm font-label-sm text-emerald-600 font-bold">OK</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="flex items-center gap-1.5 text-primary font-semibold">
+<span class="material-symbols-outlined text-primary text-sm animate-spin" data-icon="sync">sync</span>
+                Ekstraksi fitur &amp; klasifikasi MobileNetV2
+              </span>
+<span class="text-label-sm font-label-sm text-primary font-bold">70%</span>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden mt-2">
+<div class="bg-primary h-full rounded-full transition-all duration-300" style="width: 70%"></div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-4 pt-2">
+<button class="w-full py-2.5 px-4 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-semibold text-label-lg font-label-lg flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98]">
+<span>Lanjut ke Analisis Model AI</span>
+<span class="material-symbols-outlined text-base" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<p class="text-center text-label-sm font-label-sm text-on-surface-variant mt-2">
+            Waktu inferensi: ~1.2 detik pada GPU akselerator klinis
+          </p>
+</div>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- COLUMN 2: HASIL ANALISIS & GRAD-CAM (5 COLS)   -->
+<!-- ============================================== -->
+<section class="lg:col-span-5 flex flex-col gap-4">
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant/60 p-5 flex flex-col h-full shadow-[0_1px_3px_0_rgba(15,23,42,0.04)]">
+<!-- Card Header & Diagnostic Alert Pill -->
+<div class="flex items-center justify-between pb-3 border-b border-surface-container mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="query_stats">query_stats</span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">2. Hasil Prediksi &amp; Grad-CAM</h3>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-red-50 text-red-700 border border-red-200 text-label-sm font-label-sm font-bold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>
+            GERD (Tanda Refluks)
+          </span>
+</div>
+<!-- Highlight Metric Card -->
+<div class="p-3.5 rounded-lg bg-red-50/50 border border-red-200/80 mb-4 flex items-center justify-between">
+<div>
+<p class="text-label-sm font-label-sm uppercase font-bold text-red-800 tracking-wider">Hasil Klasifikasi AI</p>
+<h4 class="text-headline-md font-headline-md font-bold text-red-700 mt-0.5">GERD Positif (Esofagitis Refluks)</h4>
+<p class="text-body-sm font-body-sm text-red-900/80 mt-0.5">Terdeteksi erosi mukosa esofagus distal &amp; break pada Z-line</p>
+</div>
+<div class="text-right">
+<p class="text-label-sm font-label-sm text-red-700 font-semibold uppercase">Tingkat Kepercayaan</p>
+<p class="text-headline-xl font-headline-xl font-extrabold text-red-700 leading-none mt-1">87.6%</p>
+<span class="text-label-sm font-label-sm text-red-800 font-bold bg-red-100 px-2 py-0.5 rounded">High Confidence</span>
+</div>
+</div>
+<!-- Dual Side-by-Side Image Comparison -->
+<div class="grid grid-cols-2 gap-3 mb-4">
+<!-- Raw Endoscopy -->
+<div class="flex flex-col gap-1.5">
+<div class="relative rounded-lg overflow-hidden border border-outline-variant bg-on-background aspect-square group">
+<img alt="Gambar Asli Input Endoskopi" class="w-full h-full object-cover" data-alt="Clear high-definition white-light endoscopic view of the human lower esophageal sphincter and squamocolumnar mucosal junction showing red longitudinal erosions." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ6wUwMSqx89CabCUOxaJfoATNHNjRou6oupATuIjAxMl1c6w6VEbgVqeEnw-BsjjyQ_m2tQJu7fxKdij4N6hLcRuaFac84PObG85njWyBmZrLVKRqi2ITM1fG5o3Ra5wC7fuktfQ9xXAv6_oFxB9fj4nXaaOxFA5KoEuQB4njcgZpQJvUzQLNHUR7gMeyTpUtZb8YfX3Q63U4BjhRqa7y7C_pYE8umzYX4_90cxk-50rQH86DCxCy"/>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-white text-label-sm font-label-sm font-mono">
+                Input: 224x224 RGB
+              </div>
+</div>
+<p class="text-label-md font-label-md font-bold text-on-surface text-center">Gambar Asli (Input)</p>
+</div>
+<!-- Grad-CAM Attention Heatmap -->
+<div class="flex flex-col gap-1.5">
+<div class="relative rounded-lg overflow-hidden border border-outline-variant bg-on-background aspect-square group">
+<img alt="Heatmap Grad-CAM Visualisasi Model" class="w-full h-full object-cover mix-blend-screen" data-alt="Grad-CAM visualization overlay heat map on an endoscopic medical image highlighting inflamed esophageal tissue in bright red, yellow, and cyan contours to explain deep learning neural network attention." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApKEHTEUy1hf-PU_KRIBcAIRr9RZaZuKPiAihkD5fFsTaxfy-osjZTJ96zIkJ4W6uVOdycz3cQLK8W9Y1qS8Vh9-ZhTA4GebWOusQU_PjhpcZ06LN0JoQ_fFaU85gX613Fo8H63YKrYAniaZcmJB1B3gNtFWYzdP1mfuvM2Hv-BuGT-g-RroxSQUwoGlzDRALzdfk2Qtu4s3GrHoPOm80N0aGWwcadlbPywYv80NTPzYvYI1bBJazB"/>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-label-sm font-label-sm font-mono">
+                Grad-CAM Feature Map
+              </div>
+</div>
+<p class="text-label-md font-label-md font-bold text-primary text-center">Heatmap (Grad-CAM Explainable AI)</p>
+</div>
+</div>
+<!-- Probability Distribution Breakdown -->
+<div class="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/40 space-y-2.5">
+<p class="text-label-sm font-label-sm font-bold uppercase text-on-surface-variant tracking-wider">
+            Detail Prediksi Probabilitas Kelas
+          </p>
+<!-- Row 1: GERD Positive -->
+<div class="space-y-1">
+<div class="flex justify-between text-body-sm font-body-sm">
+<span class="font-semibold text-red-700 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-red-600"></span>
+                GERD (Esofagitis Refluks / Erosi)
+              </span>
+<span class="font-bold text-red-700 font-mono">87.6%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-red-600 h-full rounded-full" style="width: 87.6%"></div>
+</div>
+</div>
+<!-- Row 2: Normal Mucosa -->
+<div class="space-y-1">
+<div class="flex justify-between text-body-sm font-body-sm">
+<span class="text-on-surface flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                GERD Normal / Non-Erosive (NERD)
+              </span>
+<span class="text-on-surface font-mono">8.7%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-emerald-600 h-full rounded-full" style="width: 8.7%"></div>
+</div>
+</div>
+<!-- Row 3: Polyp / Suspect Lesion -->
+<div class="space-y-1">
+<div class="flex justify-between text-body-sm font-body-sm">
+<span class="text-on-surface flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                Polyp / Suspek Adenoma
+              </span>
+<span class="text-on-surface font-mono">2.1%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full rounded-full" style="width: 2.1%"></div>
+</div>
+</div>
+<!-- Row 4: Gastric Normal -->
+<div class="space-y-1">
+<div class="flex justify-between text-body-sm font-body-sm">
+<span class="text-on-surface flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                Mukosa Lambung Normal Lainnya
+              </span>
+<span class="text-on-surface font-mono">1.6%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-slate-400 h-full rounded-full" style="width: 1.6%"></div>
+</div>
+</div>
+</div>
+<!-- Bottom Actions inside Analysis Card -->
+<div class="mt-4 pt-2 flex items-center gap-3">
+<button class="flex-1 py-2 px-3 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-semibold text-label-md font-label-md transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="refresh">refresh</span>
+<span>Analisis Gambar Lain</span>
+</button>
+<button class="flex-1 py-2 px-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-semibold text-label-md font-label-md transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-base" data-icon="save">save</span>
+<span>Simpan ke Riwayat (EHR)</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- COLUMN 3: RIWAYAT PEMERIKSAAN & REKAP (3 COLS) -->
+<!-- ============================================== -->
+<section class="lg:col-span-3 flex flex-col gap-4">
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant/60 p-5 flex flex-col h-full shadow-[0_1px_3px_0_rgba(15,23,42,0.04)]">
+<div class="flex items-center justify-between pb-3 border-b border-surface-container mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="history">history</span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">Riwayat Analisis</h3>
+</div>
+<a class="text-primary text-label-sm font-label-sm font-bold hover:underline" href="#">Lihat Semua</a>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-3">
+          Daftar hasil inferensi citra pasien terkini yang telah dievaluasi oleh sistem:
+        </p>
+<!-- History Item 1 -->
+<div class="flex flex-col gap-2.5">
+<div class="p-3 rounded-lg border border-outline-variant/60 bg-surface hover:bg-surface-container-low/50 transition-colors flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<img alt="Thumb GERD" class="w-10 h-10 rounded border border-outline-variant object-cover flex-shrink-0" data-alt="Microscopic endoscopic thumbnail of esophageal tissue erosion on clinical record." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA35VI_jukxUs3zgUU-QujOxnDT3pHuzhnNA4GvE7mEhIUa23AaCSgG5nl9PvgtNIbx15kkzclRZGifLPF99Yp2ZngC4yOb6cFVPJ9ApVPaecIGaN4sGhCKzQRdicaeez22DgredDGaW-djFiPbGxB7JPF3_XdkDEcabx56w0-aQPFQzMDdm7bPwbjSojJ0ky7jyJiqV49vM7yZCJbEtZI_GZET0nnQg3e882pH_XJsuzfQdJ4MxPvE"/>
+<div>
+<p class="text-label-md font-label-md font-bold text-on-surface">#GERD-8921</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">12 Apr 2025 • 10:24</p>
+<span class="inline-block mt-0.5 text-label-sm font-label-sm font-bold text-red-700 bg-red-50 px-1.5 py-0.2 rounded border border-red-200">
+                  GERD (87.6%)
+                </span>
+</div>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary" title="Detail">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- History Item 2 -->
+<div class="p-3 rounded-lg border border-outline-variant/60 bg-surface hover:bg-surface-container-low/50 transition-colors flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<img alt="Thumb Normal" class="w-10 h-10 rounded border border-outline-variant object-cover flex-shrink-0" data-alt="Endoscopic image sample of a healthy normal esophageal mucosa without ulceration or inflammation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF5wBdHVXY17xaywZvOYBd3_SxWHNNmhg1hQhbmn7wydU00tvH_vZNRxL3dpKxg-MIJSaBbnp6mdMrn2dIYzpx3hwIx0MB3H_8Vhu1fvHv8EVo0Z59LKCYLX7xqCAy1YM8MefziQGg4qyTaHZjQqh7NfS4KToJZu5lDo6TeZ6r2hfGtT054ayDyEERXKbldCIm4ixKAaNWnkDf9kd_vmfqHr5TpU9HVGpYl7w8XeLW6QXjIvIzn0d2"/>
+<div>
+<p class="text-label-md font-label-md font-bold text-on-surface">#GERD-8910</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">10 Apr 2025 • 15:18</p>
+<span class="inline-block mt-0.5 text-label-sm font-label-sm font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                  Normal (92.3%)
+                </span>
+</div>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary" title="Detail">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- History Item 3 -->
+<div class="p-3 rounded-lg border border-outline-variant/60 bg-surface hover:bg-surface-container-low/50 transition-colors flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<img alt="Thumb Polyp" class="w-10 h-10 rounded border border-outline-variant object-cover flex-shrink-0" data-alt="Endoscopic view of a mucosal polyp in the stomach body observed during upper gastrointestinal endoscopy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw3KL0KE9Djrg2ayme_E_Ua-6gNLWaRe6MvYcUMsjSwNjp3-Vd1xbnmjXbi4Giq7KRKZwNHnebzLcZPVW7IGXE5C5_EgJCZDpEL0DpgQa7oz-uYw3bwaz31kMj8HaB7A1ohzGpsniGaJ975551J-ZOZeL357vEHJ4FnJdPXJIytC3CUhyWT9CMwITRUfYUEO5VwNu__34n3x5J0khkklguqGY8BDEqwXgsvB0A2m7T5abgVXwBvYEQ"/>
+<div>
+<p class="text-label-md font-label-md font-bold text-on-surface">#POLYP-441</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">08 Apr 2025 • 09:42</p>
+<span class="inline-block mt-0.5 text-label-sm font-label-sm font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                  Polip (78.1%)
+                </span>
+</div>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary" title="Detail">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- History Item 4 -->
+<div class="p-3 rounded-lg border border-outline-variant/60 bg-surface hover:bg-surface-container-low/50 transition-colors flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<img alt="Thumb Normal Antrum" class="w-10 h-10 rounded border border-outline-variant object-cover flex-shrink-0" data-alt="Endoscopic inspection of the stomach antrum displaying normal gastric folds." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR8gTjf1FeeEZceaw8CnUT0SG6OCAM1_Crt-5ZOnf9UD_41uctGdedlrlF2r5e4t0xq_dTs0Z9SeUI2RQ10jZjigw5-hafgqhzBuG5TZExh7h2i6wHwwkyOD-mUjAoqu-XrnNqqgk5TL_yIxagddjY1qVfOUQWlGkM3B0SJOCAG8vRP5RANjS53sjwhMYMZTpa3Tygt173eQNB3Te6WsrODwJkeCFEhEnAoZT_LHaobFnp1rTH0B6G"/>
+<div>
+<p class="text-label-md font-label-md font-bold text-on-surface">#GERD-8894</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">05 Apr 2025 • 14:37</p>
+<span class="inline-block mt-0.5 text-label-sm font-label-sm font-bold text-red-700 bg-red-50 px-1.5 py-0.2 rounded border border-red-200">
+                  GERD (85.4%)
+                </span>
+</div>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary" title="Detail">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Pagination Micro Widget -->
+<div class="mt-auto pt-4 flex items-center justify-between border-t border-surface-container">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Hal 1 dari 8</span>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded border border-outline-variant bg-surface flex items-center justify-center text-on-surface disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-7 h-7 rounded bg-primary text-on-primary text-label-sm font-label-sm font-bold flex items-center justify-center">
+              1
+            </button>
+<button class="w-7 h-7 rounded border border-outline-variant bg-surface hover:bg-surface-container text-on-surface text-label-sm font-label-sm flex items-center justify-center">
+              2
+            </button>
+<button class="w-7 h-7 rounded border border-outline-variant bg-surface hover:bg-surface-container text-on-surface text-label-sm font-label-sm flex items-center justify-center">
+              3
+            </button>
+<button class="w-7 h-7 rounded border border-outline-variant bg-surface flex items-center justify-center text-on-surface hover:bg-surface-container">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- ============================================== -->
+<!-- CLINICAL WORKFLOW STEPPER                      -->
+<!-- ============================================== -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6"><div class="lg:col-span-7 bg-surface-container-lowest rounded-lg border border-outline-variant/60 p-5 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)] flex flex-col justify-between"><div class="flex items-center justify-between pb-3 border-b border-surface-container mb-3"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-xl">touch_app</span><h4 class="text-headline-sm font-headline-sm font-bold text-on-surface">Interaksi Pengguna (Tombol &amp; Aksi)</h4></div><span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 rounded text-on-surface-variant font-semibold">Panduan Tombol UI</span></div><p class="text-body-sm font-body-sm text-on-surface-variant mb-3">Daftar tombol navigasi dan fungsi operasional di setiap halaman sistem:</p><div class="overflow-hidden rounded-lg border border-outline-variant/40"><div class="grid grid-cols-12 bg-surface-container-low px-3 py-2 text-label-sm font-label-sm font-bold text-on-surface uppercase border-b border-outline-variant/30"><div class="col-span-3">Halaman</div><div class="col-span-4">Tombol / Aksi</div><div class="col-span-5">Fungsi</div></div><div class="divide-y divide-outline-variant/20 text-body-sm font-body-sm bg-surface"><div class="grid grid-cols-12 px-3 py-2 items-center hover:bg-surface-container-low/50"><div class="col-span-3 font-semibold flex items-center gap-1.5 text-on-surface"><span class="material-symbols-outlined text-base text-primary">home</span><span>Beranda</span></div><div class="col-span-4"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary text-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">play_arrow</span>Mulai Analisis</span></div><div class="col-span-5 text-on-surface-variant">Menuju halaman upload citra</div></div><div class="grid grid-cols-12 px-3 py-2 items-center hover:bg-surface-container-low/50"><div class="col-span-3 font-semibold flex items-center gap-1.5 text-on-surface"><span class="material-symbols-outlined text-base text-primary">cloud_upload</span><span>Upload</span></div><div class="col-span-4 space-y-1"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-outline-variant bg-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">folder_open</span>Pilih File</span><br/><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary text-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">arrow_forward</span>Lanjut ke Analisis</span></div><div class="col-span-5 text-on-surface-variant">Memilih gambar dari perangkat lalu mengirim gambar ke model</div></div><div class="grid grid-cols-12 px-3 py-2 items-center hover:bg-surface-container-low/50"><div class="col-span-3 font-semibold flex items-center gap-1.5 text-on-surface"><span class="material-symbols-outlined text-base text-primary">sync</span><span>Analisis</span></div><div class="col-span-4"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container text-label-sm font-semibold"><span class="material-symbols-outlined text-xs animate-spin">sync</span>Proses Otomatis</span></div><div class="col-span-5 text-on-surface-variant">Menampilkan progress inferensi neural network</div></div><div class="grid grid-cols-12 px-3 py-2 items-center hover:bg-surface-container-low/50"><div class="col-span-3 font-semibold flex items-center gap-1.5 text-on-surface"><span class="material-symbols-outlined text-base text-primary">query_stats</span><span>Hasil</span></div><div class="col-span-4 space-y-1"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-outline-variant bg-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">refresh</span>Analisis Gambar Lain</span><br/><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary text-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">save</span>Simpan ke Riwayat</span></div><div class="col-span-5 text-on-surface-variant">Kembali ke upload atau menyimpan hasil ke riwayat</div></div><div class="grid grid-cols-12 px-3 py-2 items-center hover:bg-surface-container-low/50"><div class="col-span-3 font-semibold flex items-center gap-1.5 text-on-surface"><span class="material-symbols-outlined text-base text-primary">history</span><span>Riwayat</span></div><div class="col-span-4"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-outline-variant bg-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">visibility</span>Lihat Detail</span></div><div class="col-span-5 text-on-surface-variant">Melihat hasil rekap pemeriksaan lengkap</div></div><div class="grid grid-cols-12 px-3 py-2 items-center hover:bg-surface-container-low/50"><div class="col-span-3 font-semibold flex items-center gap-1.5 text-on-surface"><span class="material-symbols-outlined text-base text-primary">person</span><span>Profil</span></div><div class="col-span-4 space-y-1"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-primary text-primary bg-white text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">edit</span>Ubah Profil</span><br/><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-red-200 text-red-700 bg-red-50 text-label-sm font-semibold"><span class="material-symbols-outlined text-xs">logout</span>Logout</span></div><div class="col-span-5 text-on-surface-variant">Mengedit data pengguna dan keluar dari akun</div></div></div></div></div><div class="lg:col-span-5 bg-surface-container-lowest rounded-lg border border-outline-variant/60 p-5 shadow-[0_1px_3px_0_rgba(15,23,42,0.04)] flex flex-col justify-between"><div class="flex items-center justify-between pb-3 border-b border-surface-container mb-3"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-xl">account_tree</span><h4 class="text-headline-sm font-headline-sm font-bold text-on-surface">Alur Penggunaan (Dari Upload hingga Hasil)</h4></div><span class="text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded font-bold">6 Tahap SOP</span></div><div class="space-y-2.5"><div class="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-surface-container-low/50 transition-colors"><div class="w-7 h-7 rounded-full bg-primary-fixed text-primary font-bold flex items-center justify-center text-label-sm flex-shrink-0">1</div><div><p class="text-label-md font-label-md font-bold text-on-surface">1. Akses Web</p><p class="text-body-sm font-body-sm text-on-surface-variant">Buka aplikasi dan login (jika diperlukan).</p></div></div><div class="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-surface-container-low/50 transition-colors"><div class="w-7 h-7 rounded-full bg-primary-fixed text-primary font-bold flex items-center justify-center text-label-sm flex-shrink-0">2</div><div><p class="text-label-md font-label-md font-bold text-on-surface">2. Unggah Gambar</p><p class="text-body-sm font-body-sm text-on-surface-variant">Pilih gambar endoskopi dan pastikan format sesuai.</p></div></div><div class="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-surface-container-low/50 transition-colors"><div class="w-7 h-7 rounded-full bg-primary-fixed text-primary font-bold flex items-center justify-center text-label-sm flex-shrink-0">3</div><div><p class="text-label-md font-label-md font-bold text-on-surface">3. Validasi &amp; Preprocessing</p><p class="text-body-sm font-body-sm text-on-surface-variant">Sistem memeriksa file, mengubah ukuran, dan menormalisasi gambar.</p></div></div><div class="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-surface-container-low/50 transition-colors"><div class="w-7 h-7 rounded-full bg-primary-fixed text-primary font-bold flex items-center justify-center text-label-sm flex-shrink-0">4</div><div><p class="text-label-md font-label-md font-bold text-on-surface">4. Analisis oleh Model</p><p class="text-body-sm font-body-sm text-on-surface-variant">Model deep learning (MobileNetV2) memproses gambar.</p></div></div><div class="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-surface-container-low/50 transition-colors"><div class="w-7 h-7 rounded-full bg-primary-fixed text-primary font-bold flex items-center justify-center text-label-sm flex-shrink-0">5</div><div><p class="text-label-md font-label-md font-bold text-on-surface">5. Lihat Hasil Prediksi</p><p class="text-body-sm font-body-sm text-on-surface-variant">Dapatkan kelas, skor, heatmap, dan penjelasan.</p></div></div><div class="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-surface-container-low/50 transition-colors"><div class="w-7 h-7 rounded-full bg-primary-fixed text-primary font-bold flex items-center justify-center text-label-sm flex-shrink-0">6</div><div><p class="text-label-md font-label-md font-bold text-on-surface">6. Simpan / Lihat Riwayat</p><p class="text-body-sm font-body-sm text-on-surface-variant">Hasil dapat disimpan dan diakses kembali di menu riwayat.</p></div></div></div></div></div>
+<!-- ============================================== -->
+<!-- FOOTER: COMPLIANCE & LEGAL ACCREDITATION       -->
+<!-- ============================================== -->
+<footer class="pt-2 pb-6 border-t border-outline-variant/30 flex flex-col md:flex-row items-center justify-between text-on-surface-variant text-label-sm font-label-sm gap-4">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base" data-icon="check_circle">check_circle</span>
+<span><strong>Ingat!</strong> Sistem ini hanya memberikan klasifikasi citra medis, bukan diagnosis final GERD definitif.</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span>Kepatuhan: Lyon Consensus 2.0</span>
+<span>•</span>
+<span>HL7 FHIR Interoperability</span>
+<span>•</span>
+<span>PHI De-identification Valid</span>
+<span>•</span>
+<span class="text-primary font-semibold">GERD AI v2.4.1</span>
+</div>
+</footer>
+</main>
+</body></html>
