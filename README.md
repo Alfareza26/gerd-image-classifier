@@ -33,7 +33,7 @@ Pastikan perangkat Anda telah terpasang:
 ### A. Penyiapan Backend
 Buka terminal (PowerShell atau Command Prompt) dan masuk ke direktori `backend`:
 ```powershell
-cd "c:\Users\User\Documents\Project\GERD Classification\backend"
+cd backend"
 ```
 
 Pastikan virtual environment telah aktif atau gunakan Python dari `.venv`:
@@ -50,7 +50,7 @@ Pastikan file model dan konfigurasi Guard berikut tersedia pada folder `backend/
 ### B. Penyiapan Frontend
 Buka terminal baru dan masuk ke direktori `frontend`:
 ```powershell
-cd "c:\Users\User\Documents\Project\GERD Classification\frontend"
+cd frontend"
 
 # Instal dependensi paket node
 npm install
@@ -91,11 +91,11 @@ npm run dev
 
 ### Langkah 3: Akses Aplikasi
 - Buka browser Anda dan akses antarmuka web:
-  👉 **http://localhost:3000**
+   **http://localhost:3000**
 - Akses dokumentasi interaktif Swagger API (Backend):
-  👉 **http://127.0.0.1:8000/docs**
+   **http://127.0.0.1:8000/docs**
 - Cek status kesiapan model (*Health Check*):
-  👉 **http://127.0.0.1:8000/health**
+   **http://127.0.0.1:8000/health**
 
 ---
 
