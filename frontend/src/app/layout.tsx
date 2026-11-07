@@ -1,19 +1,23 @@
-import React from 'react';
+import type { Metadata } from 'next';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/plus-jakarta-sans';
 import './globals.css';
 
-export const metadata = {
-  title: 'GERD Image Classifier - AI untuk Analisis Citra Endoskopi Medis',
-  description: 'Sistem klasifikasi citra medis berbasis deep learning untuk membantu analisis tanda-tanda yang berkaitan dengan GERD pada citra endoskopi.',
+export const metadata: Metadata = {
+  title: 'GERD AI - Medical Image Classifier',
+  description: 'Klasifikasi citra endoskopi dan deteksi dini refluks gastroesofagus (GERD) berbasis CNN.',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Pilih tema sebelum paint supaya tidak berkedip: pilihan tersimpan, kalau tidak ada ikut sistem.
+const themeScript = `try{var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}`;
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-[#faf8ff] text-[#131b2e] antialiased min-h-screen selection:bg-[#cce5ff] selection:text-[#001d31]">
-      {children}
-    </div>
+    <html lang="id" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body>{children}</body>
+    </html>
   );
 }

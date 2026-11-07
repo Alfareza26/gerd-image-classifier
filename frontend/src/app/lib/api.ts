@@ -1,70 +1,74 @@
-import { HISTORY_RECORDS, InspectionRecord, INITIAL_PROBABILITIES } from './data';
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
-const STORAGE_KEY = 'gerd_classifier_records';
+/**
+ * Kontrak respons dari backend POST /predict.
+ *
+ * Backend mengembalikan field berikut:
+ *   prediction : "GERD" | "GERD_Normal" | "DITOLAK"
+ *   status     : sama dengan prediction
+ *   confidence : number (0–1) atau null jika DITOLAK
+ *   probabilities : { GERD: number, GERD_Normal: number } | null
+ *   skor_gerd  : number | undefined  (hanya saat lolos gate)
+ *   threshold  : number | undefined
+ *   guard      : boolean
+ *   gate       : object   (detail image-type gate)
+ *   reason     : string
+ *   model      : string
+ *   disclaimer : string
+ *   filename   : string
+ */
+export type GateResult = {
+  status: string;
+  alasan?: string;
+  skor_non_endoscopy?: number;
+  ambang_non_endoscopy?: number;
+};
 
-export interface PreprocessingStatus {
-  bitIntegrity: 'pending' | 'ok' | 'error';
-  resizeNormalize: 'pending' | 'ok' | 'error';
-  featureExtractionProgress: number; // 0 to 100
-}
+export type Prediction = {
+  prediction: string;
+  status: string;
+  confidence: number | null;
+  probabilities: { GERD: number; GERD_Normal: number } | null;
+  skor_gerd?: number;
+  threshold?: number;
+  guard: boolean;
+  gate: GateResult;
+  reason: string;
+  model: string;
+  disclaimer: string;
+  filename: string;
+};
 
-export function getLocalRecords(): InspectionRecord[] {
-  if (typeof window === 'undefined') return HISTORY_RECORDS;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(HISTORY_RECORDS));
-      return HISTORY_RECORDS;
+/**
+ * Kirim citra endoskopi ke backend untuk klasifikasi.
+ * Backend hanya menerima field `file` (UploadFile).
+ */
+export async function classify(file: File): Promise<Prediction> {
+  const body = new FormData();
+  body.append('file', file);
+
+  const res = await fetch(`${API}/predict`, { method: 'POST', body });
+
+  if (!res.ok) {
+    // FastAPI mengembalikan { detail: "..." } pada error
+    let detail = `Server menjawab ${res.status}`;
+    try {
+      const err = await res.json();
+      if (err.detail) detail = err.detail;
+    } catch {
+      /* respons bukan JSON, gunakan pesan default */
     }
-    return JSON.parse(raw);
-  } catch {
-    return HISTORY_RECORDS;
+    throw new Error(detail);
   }
+
+  return res.json();
 }
 
-export function saveLocalRecord(record: InspectionRecord): InspectionRecord[] {
-  if (typeof window === 'undefined') return HISTORY_RECORDS;
-  try {
-    const existing = getLocalRecords();
-    const updated = [record, ...existing.filter(r => r.code !== record.code)];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    return updated;
-  } catch {
-    return [record, ...HISTORY_RECORDS];
-  }
-}
-
-export async function runInferenceSimulation(
-  fileName: string,
-  onProgress?: (progress: number, stepLabel: string) => void
-): Promise<{
-  category: 'GERD' | 'Normal' | 'Polyp';
-  confidence: number;
-  description: string;
-  probabilities: typeof INITIAL_PROBABILITIES;
-}> {
-  return new Promise((resolve) => {
-    let current = 0;
-    const interval = setInterval(() => {
-      current += 15;
-      if (current < 40) {
-        onProgress?.(current, 'Validasi bit citra & normalisasi resolusi...');
-      } else if (current < 85) {
-        onProgress?.(current, 'Ekstraksi fitur layer konvolusional MobileNetV2...');
-      } else if (current < 100) {
-        onProgress?.(current, 'Komputasi gradien aktivasi Grad-CAM & softmax...');
-      } else {
-        clearInterval(interval);
-        onProgress?.(100, 'Inferensi selesai');
-        
-        // Return realistic result
-        resolve({
-          category: 'GERD',
-          confidence: 87.6,
-          description: 'Terdeteksi erosi mukosa esofagus distal & break pada Z-line',
-          probabilities: INITIAL_PROBABILITIES,
-        });
-      }
-    }, 180);
-  });
+/**
+ * Cek kesehatan backend.
+ */
+export async function checkHealth(): Promise<{ status: string; model_loaded: boolean }> {
+  const res = await fetch(`${API}/health`);
+  if (!res.ok) throw new Error(`Health check gagal: ${res.status}`);
+  return res.json();
 }

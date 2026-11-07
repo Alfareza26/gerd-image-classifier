@@ -1,20 +1,26 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# GERD AI frontend (Next.js)
 
-# Run and deploy your AI Studio app
+Letakkan folder ini sebagai `frontend/` di root proyek GERD Classification.
 
-This contains everything you need to run your app locally.
+```bash
+cd frontend
+cp .env.example .env.local     # sesuaikan BACKEND_URL
+npm install
+npm run dev                    # http://localhost:3000
+# terminal lain, dari root proyek:
+uvicorn backend.main:app --port 8000
+```
 
-View your app in AI Studio: https://ai.studio/apps/83db5426-e307-42de-b339-3f1661e47f55
+Browser memanggil `/api/*`, lalu `next.config.mjs` meneruskannya ke FastAPI. Tidak perlu mengaktifkan CORS.
 
-## Run Locally
+## Yang perlu dicocokkan dengan backend
 
-**Prerequisites:**  Node.js
+| Hal | Lokasi | Asumsi sekarang |
+| --- | --- | --- |
+| Path endpoint | `NEXT_PUBLIC_PREDICT_PATH` | `POST /predict`, field multipart `file` |
+| Bentuk respons | `normalize()` di `lib/api.ts` | `label`, `confidence`, opsional `probabilities` |
+| Citra ditolak gerbang | `app/analisis/page.tsx` | status 4xx, pesan di `detail` |
 
+## Penyimpanan
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Riwayat dan profil disimpan di `localStorage` (`lib/store.ts`). Login, registrasi, dan lupa sandi belum terhubung ke backend (`lib/auth.ts`).

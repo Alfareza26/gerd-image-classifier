@@ -1,0 +1,18 @@
+{
+  "model_name": "EfficientNetB0_ImageTypeGate",
+  "input_size": [
+    224,
+    224
+  ],
+  "classes": {
+    "0": "endoscopy",
+    "1": "non_endoscopy"
+  },
+  "non_endoscopy_threshold": 0.01,
+  "threshold_note": "Illustrative only; choose using validation metrics and validate on independent external images.",
+  "dataset_sources": [
+    "HyperKvasir labeled images: https://datasets.simula.no/hyper-kvasir/",
+    "NIH ChestX-ray dataset: https://nihcc.app.box.com/v/ChestXray-NIHCC",
+    "CIFAR-10: https://www.cs.toronto.edu/~kriz/cifar.html"
+  ]
+}
