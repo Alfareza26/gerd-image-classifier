@@ -5,8 +5,6 @@ export type Prediction = {
   label: Label;
   confidence: number; // 0..1
   probabilities?: Record<string, number>; // 0..1
-  skorGerd?: number;
-  disclaimer?: string;
 };
 
 export class ApiError extends Error {
@@ -36,8 +34,6 @@ export function normalize(raw: unknown): Prediction {
     label: /normal/i.test(labelRaw) ? "Normal" : "GERD",
     confidence: toUnit(conf),
     probabilities,
-    skorGerd: typeof r?.skor_gerd === "number" ? r.skor_gerd : undefined,
-    disclaimer: typeof r?.disclaimer === "string" ? r.disclaimer : undefined,
   };
 }
 

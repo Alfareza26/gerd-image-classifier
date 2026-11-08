@@ -5,8 +5,22 @@ import ResultDialog from "@/components/ResultDialog";
 import { ApiError, predict } from "@/lib/api";
 import { addRecord, DEFAULT_PROFILE, makeThumb, PROFILE_KEY, useStored, type HistoryRecord } from "@/lib/store";
 
-const OK_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const OK_TYPES = ["image/jpeg", "image/png", "image/bmp"];
+const OK_EXTS = [".jpg", ".jpeg", ".png", ".bmp"];
+const ACCEPT_ATTR = "image/jpeg,image/png,image/bmp,.jpg,.jpeg,.png,.bmp";
 const MAX_MB = 10;
+
+function formatSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function isValidImage(f: File) {
+  const typeMatch = OK_TYPES.includes(f.type.toLowerCase());
+  const nameMatch = OK_EXTS.some((ext) => f.name.toLowerCase().endsWith(ext));
+  return typeMatch || nameMatch;
+}
 
 export default function Analisis() {
   const [profile] = useStored(PROFILE_KEY, DEFAULT_PROFILE);
@@ -25,9 +39,37 @@ export default function Analisis() {
   function pick(f?: File) {
     if (!f) return;
     setError(""); setRejected(""); setSaved(false);
-    if (!OK_TYPES.includes(f.type)) return setError("Format harus JPG, PNG, atau WEBP.");
-    if (f.size > MAX_MB * 1024 * 1024) return setError(`Ukuran berkas melebihi ${MAX_MB} MB.`);
-    setFile(f); setUrl(URL.createObjectURL(f));
+    if (!isValidImage(f)) return setError("Format berkas harus JPG, PNG, atau BMP.");
+    if (f.size > MAX_MB * 1024 * 1024) {
+      return setError(`Ukuran berkas (${formatSize(f.size)}) melebihi batas maksimal ${MAX_MB} MB.`);
+    }
+
+    if (url) URL.revokeObjectURL(url);
+    setFile(f);
+    setUrl(URL.createObjectURL(f));
+  }
+
+  function clearFile() {
+    if (url) URL.revokeObjectURL(url);
+    setFile(null);
+    setUrl("");
+    setError("");
+    setRejected("");
+    if (input.current) input.current.value = "";
+  }
+
+  async function loadSample(fileName: string, title: string) {
+    setError("");
+    setRejected("");
+    try {
+      const res = await fetch(`/img/${fileName}`);
+      if (!res.ok) throw new Error("Gagal mengambil citra sampel.");
+      const blob = await res.blob();
+      const sampleFile = new File([blob], `${title}.jpg`, { type: "image/jpeg" });
+      pick(sampleFile);
+    } catch {
+      setError("Citra sampel tidak dapat dimuat.");
+    }
   }
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -60,26 +102,128 @@ export default function Analisis() {
 
       <form className="grid-2" style={{ marginTop: 40 }} onSubmit={submit}>
         <section className="panel stack" style={{ ["--gap" as string]: "16px" }}>
-          <h3>1. Citra endoskopi</h3>
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
+            <h3>1. Citra endoskopi</h3>
+            <span className="small muted">JPG, PNG, BMP · Maks {MAX_MB} MB</span>
+          </div>
+
           {url ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="Pratinjau citra endoskopi" className="preview" />
-              <div className="row" style={{ justifyContent: "space-between" }}>
-                <span className="small muted mono">{file?.name} · {(file!.size / 1048576).toFixed(1)} MB</span>
-                <button type="button" className="btn btn-ghost" onClick={() => input.current?.click()}>Ganti citra</button>
+            <div className="stack" style={{ ["--gap" as string]: "12px" }}>
+              <div style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r-md)", background: "#000" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="Pratinjau citra endoskopi" className="preview" />
               </div>
-            </>
+              <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ minWidth: 0, maxWidth: "65%" }}>
+                  <div className="small mono" style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {file?.name}
+                  </div>
+                  <span className="small muted">{file ? formatSize(file.size) : ""} · Siap dianalisis</span>
+                </div>
+                <div className="row" style={{ gap: 8 }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ padding: "6px 12px", minHeight: 34, fontSize: 13 }}
+                    onClick={() => {
+                      if (input.current) input.current.value = "";
+                      input.current?.click();
+                    }}
+                  >
+                    Ganti citra
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ padding: "6px 12px", minHeight: 34, fontSize: 13, color: "var(--danger)" }}
+                    onClick={clearFile}
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : (
-            <label className={`drop ${over ? "over" : ""}`} onDragOver={(e) => { e.preventDefault(); setOver(true); }}
-              onDragLeave={() => setOver(false)} onDrop={(e) => { e.preventDefault(); setOver(false); pick(e.dataTransfer.files[0]); }}>
-              <p style={{ fontWeight: 600 }}>Tarik citra ke sini atau klik untuk memilih berkas</p>
-              <p className="hint" style={{ marginTop: 6 }}>JPG, PNG, atau WEBP · maksimal {MAX_MB} MB</p>
-            </label>
+            <div className="stack" style={{ ["--gap" as string]: "12px" }}>
+              <div
+                role="button"
+                tabIndex={0}
+                className={`drop ${over ? "over" : ""}`}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 12,
+                  cursor: "pointer",
+                  outline: "none",
+                  transition: "all 0.15s ease",
+                  padding: "40px 20px",
+                }}
+                onClick={() => {
+                  if (input.current) input.current.value = "";
+                  input.current?.click();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    if (input.current) input.current.value = "";
+                    input.current?.click();
+                  }
+                }}
+                onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+                onDragLeave={() => setOver(false)}
+                onDrop={(e) => { e.preventDefault(); setOver(false); pick(e.dataTransfer.files?.[0]); }}
+              >
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: "50%",
+                    background: "var(--surface)",
+                    display: "grid",
+                    placeItems: "center",
+                    color: "var(--primary)",
+                  }}
+                >
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: 15 }}>Tarik citra ke sini atau klik untuk memilih berkas</p>
+                  <p className="hint" style={{ marginTop: 4 }}>JPG, PNG, atau BMP · maksimal {MAX_MB} MB</p>
+                </div>
+              </div>
+            </div>
           )}
-          <input ref={input} type="file" accept={OK_TYPES.join(",")} hidden onChange={(e) => pick(e.target.files?.[0])} aria-label="Pilih citra" />
+
+          <input
+            ref={input}
+            id="image-file-input"
+            type="file"
+            accept={ACCEPT_ATTR}
+            hidden
+            onChange={(e) => {
+              pick(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+            aria-label="Pilih citra endoskopi"
+          />
+
           {rejected && (
-            <div className="notice bad" role="alert"><b>Citra ditolak.</b> {rejected}</div>
+            <div className="notice bad" role="alert" style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 18, lineHeight: 1 }}>⚠️</span>
+              <div>
+                <b>Citra ditolak oleh sistem keamanan (Guard):</b>
+                <p style={{ marginTop: 4 }}>{rejected}</p>
+                <p className="small muted" style={{ marginTop: 6 }}>
+                  Pastikan gambar yang diunggah adalah foto endoskopi esofagus/lambung asli, bukan dokumen teks, foto rontgen, atau ilustrasi.
+                </p>
+              </div>
+            </div>
           )}
         </section>
 
